@@ -1,0 +1,14 @@
+# Node (React/Frontend)
+node_modules/
+dist/
+build/
+.env
+
+# .NET (Backend)
+[Bb]in/
+[Oo]bj/
+appsettings.json
+appsettings.*.json
+
+# macOS
+.DS_Store
