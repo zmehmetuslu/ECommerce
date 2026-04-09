@@ -5,9 +5,13 @@ export const getCart = async () => {
   return res.data;
 };
 
-export const addToCart = async (data) => {
-  const res = await api.post("/Cart/add", data);
-  return res.data;
+export const addToCart = async (productId, quantity) => {
+  // 🔥 KRİTİK: Backend AddToCartDto tam olarak bu isimleri (PascalCase) bekliyor
+  const response = await api.post("/Cart/add", {
+    ProductId: Number(productId),
+    Quantity: Number(quantity || 1)
+  });
+  return response.data;
 };
 
 export const removeFromCart = async (productId) => {
@@ -17,7 +21,7 @@ export const removeFromCart = async (productId) => {
 
 export const updateCartQuantity = async (productId, quantity) => {
   const res = await api.put(`/Cart/update-quantity/${productId}`, {
-    quantity,
+    Quantity: Number(quantity),
   });
   return res.data;
 };
