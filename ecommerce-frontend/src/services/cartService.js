@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getCart = async () => {
   const res = await api.get("/Cart");
-  return res.data;
+  return res.data?.data;
 };
 
 export const addToCart = async (productId, quantity) => {
@@ -11,17 +11,17 @@ export const addToCart = async (productId, quantity) => {
     ProductId: Number(productId),
     Quantity: Number(quantity || 1)
   });
-  return response.data;
+  return response.data?.data;
 };
 
 export const removeFromCart = async (productId) => {
   const res = await api.delete(`/Cart/remove/${productId}`);
-  return res.data;
+  return res.data?.data;
 };
 
 export const updateCartQuantity = async (productId, quantity) => {
   const res = await api.put(`/Cart/update-quantity/${productId}`, {
     Quantity: Number(quantity),
   });
-  return res.data;
+  return res.data?.data;
 };

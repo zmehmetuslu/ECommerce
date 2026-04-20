@@ -21,4 +21,10 @@ public class AppDbContext : DbContext
 
     public DbSet<Order> Orders { get; set; }
     public DbSet<OrderItem> OrderItems { get; set; }
+    public DbSet<OrderStatusLog> OrderStatusLogs { get; set; }
+    public DbSet<WishlistItem> WishlistItems { get; set; }
+    public DbSet<Coupon> Coupons { get; set; }
+    public DbSet<CouponUsage> CouponUsages { get; set; }
+    public DbSet<ProductReview> ProductReviews { get; set; }
+    public DbSet<ReviewHelpfulVote> ReviewHelpfulVotes { get; set; }
 }

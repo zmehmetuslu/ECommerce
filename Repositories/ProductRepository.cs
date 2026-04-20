@@ -53,6 +53,12 @@ public bool DeleteProduct(int id)
     product.Price = updatedProduct.Price;
     product.Stock = updatedProduct.Stock;
     product.ImageUrl = updatedProduct.ImageUrl;
+    product.ShortDescription = updatedProduct.ShortDescription;
+    product.Unit = updatedProduct.Unit;
+    product.LowStockThreshold = updatedProduct.LowStockThreshold;
+    product.Badge = updatedProduct.Badge;
+    product.IsFeatured = updatedProduct.IsFeatured;
+    product.CategoryId = updatedProduct.CategoryId;
 
     _context.SaveChanges();
 

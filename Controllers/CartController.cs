@@ -25,7 +25,7 @@ public class CartController : ControllerBase
 
         if (string.IsNullOrEmpty(username))
         {
-            return Unauthorized("User not found in token.");
+            return Unauthorized(ApiResponse<object>.Fail("User not found in token."));
         }
 
         // Service'e gönderiyoruz
@@ -33,10 +33,10 @@ public class CartController : ControllerBase
 
         if (result == "Product added to cart successfully.")
         {
-            return Ok(result);
+            return Ok(ApiResponse<object>.Ok(null, result));
         }
 
-        return BadRequest(result);
+        return BadRequest(ApiResponse<object>.Fail(result));
     }
 
     [HttpGet]
@@ -47,7 +47,7 @@ public IActionResult GetCart()
 
     if (string.IsNullOrEmpty(username))
     {
-        return Unauthorized("User not found in token.");
+        return Unauthorized(ApiResponse<object>.Fail("User not found in token."));
     }
 
     // Service'e gidip kullanıcının sepetini alıyoruz
@@ -55,7 +55,7 @@ public IActionResult GetCart()
 
     if (cart == null)
     {
-        return Ok(new CartDto()); // sepet yoksa boş sepet dön
+        return Ok(ApiResponse<CartDto>.Ok(new CartDto())); // sepet yoksa boş sepet dön
     }
 
     // Entity → DTO dönüşümü yapıyoruz
@@ -65,6 +65,7 @@ public IActionResult GetCart()
     {
         ProductId = item.ProductId, // ürün id
         ProductName = item.Product?.Name ?? string.Empty, // ürün adı
+        ProductImageUrl = item.Product?.ImageUrl ?? string.Empty, // ürün görseli
         Quantity = item.Quantity, // kaç tane
         Price = item.Product?.Price ?? 0, // tek fiyat
         LineTotal = (item.Product?.Price ?? 0) * item.Quantity // satır toplamı
@@ -74,7 +75,7 @@ public IActionResult GetCart()
 // bütün satır toplamlarını toplayıp sepet toplamını hesaplıyoruz
 cartDto.TotalPrice = cartDto.Items.Sum(i => i.LineTotal);
 
-return Ok(cartDto);
+return Ok(ApiResponse<CartDto>.Ok(cartDto));
 }
 
 [HttpDelete("remove/{productId}")]
@@ -85,7 +86,7 @@ public IActionResult RemoveFromCart(int productId)
 
     if (string.IsNullOrEmpty(username))
     {
-        return Unauthorized("User not found in token.");
+        return Unauthorized(ApiResponse<object>.Fail("User not found in token."));
     }
 
     // Service'e gönderiyoruz
@@ -93,10 +94,10 @@ public IActionResult RemoveFromCart(int productId)
 
     if (result == "Product removed from cart successfully.")
     {
-        return Ok(result);
+        return Ok(ApiResponse<object>.Ok(null, result));
     }
 
-    return BadRequest(result);
+    return BadRequest(ApiResponse<object>.Fail(result));
 }
 [HttpPut("update-quantity/{productId}")]
 public IActionResult UpdateCartItemQuantity(int productId, UpdateCartItemQuantityDto dto)
@@ -106,7 +107,7 @@ public IActionResult UpdateCartItemQuantity(int productId, UpdateCartItemQuantit
 
     if (string.IsNullOrEmpty(username))
     {
-        return Unauthorized("User not found in token.");
+        return Unauthorized(ApiResponse<object>.Fail("User not found in token."));
     }
 
     // Service'e gidip quantity güncellemesini yapıyoruz
@@ -114,9 +115,48 @@ public IActionResult UpdateCartItemQuantity(int productId, UpdateCartItemQuantit
 
     if (result == "Cart item quantity updated successfully." || result == "Product removed from cart.")
     {
-        return Ok(result);
+        return Ok(ApiResponse<object>.Ok(null, result));
     }
 
-    return BadRequest(result);
+    return BadRequest(ApiResponse<object>.Fail(result));
 }
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+BU DOSYANIN AÇIKLAMASI:
+
+Bu controller, kullanıcıların sepet işlemlerini yönetir.
+Sepete ürün ekleme, sepeti görüntüleme, ürün silme ve ürün miktarını değiştirme işlemleri burada yapılır.
+[Authorize] kullanıldığı için bu işlemler için kullanıcı giriş yapmış olmalıdır.
+
+ÇALIŞMA MANTIĞI:
+- Frontend'den gelen istekler bu controller tarafından alınır
+- Token içinden kullanıcı adı (username) alınır
+- İlgili işlem CartService'e gönderilir
+- Sonuç frontend'e döndürülür
+
+YAPILAN İŞLEMLER:
+- AddToCart → ürünü sepete ekler ve stok düşer
+- GetCart → sepeti getirir ve toplam fiyat hesaplanır
+- RemoveFromCart → ürünü sepetten siler ve stok geri eklenir
+- UpdateCartItemQuantity → ürün adedini günceller (stok buna göre değişir)
+
+BAĞLANTILI DOSYALAR:
+- CartService.cs → asıl iş mantığı burada
+- CartRepository.cs → veritabanı işlemleri
+- ProductRepository.cs → stok güncelleme
+- Cart.jsx → frontend sepet ekranı
+
+NOT:
+Bu controller sadece yönlendirme yapar, asıl işlemler CartService içinde gerçekleştirilir.
+*/

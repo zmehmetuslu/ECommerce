@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getCart,
   removeFromCart,
   updateCartQuantity,
 } from "../services/cartService";
-import api from "../services/api";
+import { FALLBACK_IMAGE_URL, resolveImageSrc } from "../utils/image";
 
 export default function Cart() {
+  const navigate = useNavigate();
   const [cartData, setCartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [workingId, setWorkingId] = useState(null);
@@ -75,18 +77,6 @@ export default function Cart() {
     }
   };
 
-  const handleCreateOrder = async () => {
-    try {
-      setMessage("");
-      await api.post("/Order/create");
-      setMessage("Sipariş başarıyla oluşturuldu.");
-      await loadCart();
-    } catch (error) {
-      console.error("Sipariş oluşturulamadı:", error);
-      setMessage("Sipariş oluşturulamadı.");
-    }
-  };
-
   return (
     <div className="min-h-[70vh] bg-[#f6f8f6] px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -124,25 +114,20 @@ export default function Cart() {
                   item.productName || item.name || `Ürün ${index + 1}`;
                 const quantity = Number(item.quantity || 1);
                 const price = Number(item.price || item.productPrice || 0);
-                const imageList = [
-                  "https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&w=900&q=80",
-                  "https://images.unsplash.com/photo-1592982537447-6f2a6a0f0f9b?auto=format&fit=crop&w=900&q=80",
-                  "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=900&q=80",
-                  "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=900&q=80",
-                ];
 
                 return (
                   <div
                     key={productId}
                     className="grid gap-4 rounded-3xl bg-white p-4 shadow-sm sm:grid-cols-[140px_1fr]"
                   >
-                    <div className="overflow-hidden rounded-2xl">
-                      <img
-                        src={imageList[index % imageList.length]}
-                        alt={productName}
-                        className="h-32 w-full object-cover sm:h-full"
-                      />
-                    </div>
+                 <div className="overflow-hidden rounded-2xl">
+  <img 
+    src={resolveImageSrc(item.productImageUrl || item.imageUrl)}
+    alt={productName}
+    className="h-32 w-full object-cover sm:h-full"
+    onError={(e) => { e.target.src = FALLBACK_IMAGE_URL; }} 
+  />
+</div>
 
                     <div className="flex flex-col justify-between gap-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -242,10 +227,10 @@ export default function Cart() {
               </div>
 
               <button
-                onClick={handleCreateOrder}
+                onClick={() => navigate("/checkout")}
                 className="mt-6 w-full rounded-2xl bg-green-600 py-4 text-sm font-bold text-white transition hover:bg-green-700"
               >
-                Siparişi Tamamla
+                Checkout'a Geç
               </button>
 
               <p className="mt-4 text-center text-xs text-slate-400">

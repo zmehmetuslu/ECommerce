@@ -21,28 +21,28 @@ export const getProducts = async ({
   if (sort) params.append("sort", sort);
 
   const res = await api.get(`/Products?${params.toString()}`);
-  return res.data;
+  return res.data?.data;
 };
 
 
 
 export const getProductById = async (id) => {
   const res = await api.get(`/Products/${id}`);
-  return res.data;
+  return res.data?.data;
 };
 
 export const createProduct = async (data) => {
   const res = await api.post("/Products", data);
-  return res.data;
+  return res.data?.data;
 };
 
 export const updateProduct = async (id, data) => {
   const res = await api.put(`/Products/${id}`, data);
-  return res.data;
+  return res.data?.data;
 };
 
 export const deleteProduct = async (id) => {
   const res = await api.delete(`/Products/${id}`);
-  return res.data;
+  return res.data?.data;
 };
 

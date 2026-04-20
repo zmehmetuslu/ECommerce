@@ -7,6 +7,9 @@ import Login from "./pages/Login";
 import Admin from "./pages/Admin";
 import Cart from "./pages/Cart";
 import Orders from "./pages/Orders";
+import ProductDetail from "./pages/ProductDetail";
+import Checkout from "./pages/Checkout";
+import Wishlist from "./pages/Wishlist";
 
 export default function App() {
   return (
@@ -17,8 +20,11 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

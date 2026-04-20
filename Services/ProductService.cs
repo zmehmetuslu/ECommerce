@@ -35,3 +35,43 @@ public bool UpdateProduct(int id, Product updatedProduct)
 }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+BU DOSYANIN AÇIKLAMASI:
+
+Bu service, ürün işlemlerini yönetir.
+Controller'dan gelen istekleri ProductRepository'e yönlendirir.
+
+ÇALIŞMA MANTIĞI:
+- Controller bu service'i çağırır
+- Service, işlemleri repository katmanına iletir
+- Veritabanından gelen sonuçları geri döndürür
+
+YAPILAN İŞLEMLER:
+- GetAllProducts → tüm ürünleri getirir
+- AddProduct → yeni ürün ekler
+- GetProductById → id'ye göre ürün getirir
+- DeleteProduct → ürün siler
+- UpdateProduct → ürün bilgilerini günceller
+
+BAĞLANTILI DOSYALAR:
+- ProductsController.cs → bu service'i kullanır
+- ProductRepository.cs → veritabanı işlemleri burada yapılır
+- Admin.jsx → ürün ekleme, silme, güncelleme
+- Products.jsx → ürün listeleme
+
+NOT:
+Bu service katmanında ekstra iş mantığı bulunmaz.
+Asıl veri işlemleri repository katmanında yapılır.
+*/

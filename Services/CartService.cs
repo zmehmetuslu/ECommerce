@@ -242,3 +242,79 @@ public string UpdateCartItemQuantity(string username, int productId, int newQuan
     return "Cart item quantity updated successfully.";
 }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+BU DOSYANIN AÇIKLAMASI:
+
+Bu service, sepet işlemlerinin asıl iş mantığını içerir.
+Kullanıcının sepete ürün eklemesi, ürün silmesi ve ürün miktarını değiştirmesi burada yönetilir.
+Controller sadece yönlendirir, bütün işlemler burada gerçekleşir.
+
+ÇALIŞMA MANTIĞI:
+- Token'dan gelen username ile kullanıcı bulunur
+- Ürün ve sepet bilgileri veritabanından alınır
+- İşlemler yapılır ve sonuç kaydedilir
+
+YAPILAN İŞLEMLER:
+
+AddToCart:
+- Ürün bulunur ve stok kontrol edilir
+- Kullanıcının sepeti yoksa oluşturulur
+- Ürün sepete eklenir veya quantity artırılır
+- Ürün sepete eklendiğinde stok azaltılır
+
+GetCartByUsername:
+- Kullanıcının sepeti getirilir
+
+RemoveFromCart:
+- Ürün sepetten silinir
+- Sepetten silinen miktar kadar stok geri eklenir
+
+UpdateCartItemQuantity:
+- Ürün adedi artırılırsa stok düşer
+- Ürün adedi azaltılırsa stok artar
+- Adet 0 olursa ürün tamamen sepetten silinir
+
+BAĞLANTILI DOSYALAR:
+- CartController.cs → bu service'i çağırır
+- CartRepository.cs → sepet veritabanı işlemleri
+- ProductRepository.cs → stok güncelleme
+- UserRepository.cs → kullanıcıyı bulma
+- Cart.jsx → frontend sepet ekranı
+
+NOT:
+Bu dosyada stok yönetimi yapılmaktadır.
+Sepet işlemleri ile ürün stoğu birlikte kontrol edilerek gerçek e-ticaret mantığı uygulanmıştır.
+*/

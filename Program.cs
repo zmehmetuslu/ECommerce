@@ -16,17 +16,31 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=ecommerce.db"));
 
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection(JwtSettings.SectionName)
+);
+
+var jwtSettings = builder.Configuration.GetSection(JwtSettings.SectionName).Get<JwtSettings>()
+    ?? throw new InvalidOperationException("Jwt settings are missing.");
+
+if (string.IsNullOrWhiteSpace(jwtSettings.Secret))
+{
+    throw new InvalidOperationException("Jwt:Secret must be configured.");
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = false, // issuer kontrolü yapmıyoruz
-            ValidateAudience = false, // audience kontrolü yapmıyoruz
-            ValidateLifetime = true, // token süresi dolmuş mu kontrol et
-            ValidateIssuerSigningKey = true, // imza doğru mu kontrol et
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings.Issuer,
+            ValidAudience = jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("this_is_my_super_secret_key_12345"))
+                Encoding.UTF8.GetBytes(jwtSettings.Secret))
         };
     });
 
@@ -77,21 +91,22 @@ builder.Services.AddScoped<CartRepository>();
 builder.Services.AddScoped<CartService>();
 builder.Services.AddScoped<OrderRepository>();
 builder.Services.AddScoped<OrderService>();
+builder.Services.AddScoped<WishlistRepository>();
+builder.Services.AddScoped<WishlistService>();
+builder.Services.AddScoped<CouponRepository>();
+builder.Services.AddScoped<CouponService>();
+builder.Services.AddScoped<ProductReviewRepository>();
+builder.Services.AddScoped<ProductReviewService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
         policy => policy
-            .WithOrigins("http://localhost:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod());
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:5175"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
@@ -101,6 +116,12 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await DbSeeder.SeedAsync(dbContext);
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -108,9 +129,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+public partial class Program { }

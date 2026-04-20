@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using ECommerceAPI.Entities;
 using ECommerceAPI.Services;
 using ECommerceAPI.DTOs;
@@ -29,10 +30,11 @@ public class CategoriesController : ControllerBase
             Name = c.Name
         }).ToList();
 
-        return Ok(categoryDtos);
+        return Ok(ApiResponse<List<CategoryDto>>.Ok(categoryDtos));
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult AddCategory(CreateCategoryDto dto)
     {
         var category = new Category
@@ -41,7 +43,7 @@ public class CategoriesController : ControllerBase
         };
 
         _categoryService.AddCategory(category);
-        return Ok();
+        return Ok(ApiResponse<object>.Ok(null, "Category added successfully."));
     }
 
     [HttpGet("{id}")]
@@ -51,7 +53,7 @@ public class CategoriesController : ControllerBase
 
         if (category == null)
         {
-            return NotFound();
+            return NotFound(ApiResponse<object>.Fail("Category not found."));
         }
 
         var categoryDto = new CategoryDto
@@ -60,20 +62,21 @@ public class CategoriesController : ControllerBase
             Name = category.Name
         };
 
-        return Ok(categoryDto);
+        return Ok(ApiResponse<CategoryDto>.Ok(categoryDto));
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult DeleteCategory(int id)
     {
         var isDeleted = _categoryService.DeleteCategory(id);
 
         if (!isDeleted)
         {
-            return NotFound();
+            return NotFound(ApiResponse<object>.Fail("Category not found."));
         }
 
-        return Ok();
+        return Ok(ApiResponse<object>.Ok(null, "Category deleted successfully."));
     }
 
    [HttpGet("{id}/products")]
@@ -91,6 +94,40 @@ public class CategoriesController : ControllerBase
             CategoryId = p.CategoryId
         }).ToList();
 
-        return Ok(result);
+        return Ok(ApiResponse<List<ProductDto>>.Ok(result));
     }
 }
+
+
+
+
+
+/*
+BU DOSYANIN AÇIKLAMASI:
+
+Bu controller, kategori işlemlerini yönetir.
+Kategorileri listeleme, ekleme, silme ve kategoriye göre ürün getirme işlemleri burada yapılır.
+
+ÇALIŞMA MANTIĞI:
+- Frontend'den gelen istekler bu controller'a gelir
+- İlgili işlemler CategoryService'e gönderilir
+- Veritabanından alınan veriler DTO'ya çevrilerek frontend'e gönderilir
+
+YAPILAN İŞLEMLER:
+- GetCategories → tüm kategorileri listeler
+- AddCategory → yeni kategori ekler
+- GetCategoryById → id'ye göre kategori getirir
+- DeleteCategory → kategori siler
+- GetProductsByCategory → seçilen kategoriye ait ürünleri getirir
+
+BAĞLANTILI DOSYALAR:
+- CategoryService.cs → kategori işlemlerinin mantığı burada
+- CategoryRepository.cs → veritabanı işlemleri
+- ProductRepository.cs → kategoriye ait ürünleri getirir
+- Products.jsx → frontend filtreleme kısmında kullanılır
+- Admin.jsx → kategori ekleme ve silme işlemleri
+
+NOT:
+Controller sadece istekleri yönlendirir, asıl işlemler service katmanında yapılır.
+DTO kullanımı ile veriler düzenli şekilde frontend'e gönderilir.
+*/

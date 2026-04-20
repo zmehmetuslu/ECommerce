@@ -5,7 +5,7 @@ using ECommerceAPI.Services;
 
 namespace ECommerceAPI.Controllers;
 
-[ApiController]
+[ApiController]// Bu controller API üzerinden gelen auth (giriş/kayıt) isteklerini karşılar
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
@@ -30,10 +30,14 @@ public class AuthController : ControllerBase
 
         if (!isRegistered)
         {
-            return BadRequest("Username already exists.");
+            return BadRequest(
+                ApiResponse<object>.Fail("Username already exists.")
+            );
         }
 
-        return Ok("User registered successfully.");
+        return Ok(
+            ApiResponse<object>.Ok(null, "User registered successfully.")
+        );
     }
 
     // LOGIN
@@ -45,12 +49,72 @@ public class AuthController : ControllerBase
 
         if (token == null)
         {
-            return Unauthorized("Invalid username or password.");
+            return Unauthorized(
+                ApiResponse<object>.Fail("Invalid username or password.")
+            );
         }
 
-        return Ok(new LoginResponseDto
-        {
-            Token = token
-        });
+        return Ok(
+            ApiResponse<LoginResponseDto>.Ok(
+                new LoginResponseDto { Token = token },
+                "Login successful."
+            )
+        );
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+BU DOSYANIN AÇIKLAMASI:
+
+Bu controller, kullanıcıların sisteme kayıt olmasını ve giriş yapmasını sağlar.
+Frontend tarafı bu dosyaya "/api/Auth" endpointi üzerinden istek gönderir.
+
+REGISTER (KAYIT):
+- Kullanıcıdan username ve password alınır.
+- Bu bilgilerle yeni bir User nesnesi oluşturulur.
+- UserService üzerinden kayıt işlemi yapılır.
+- Eğer aynı kullanıcı adı varsa hata döner.
+- Eğer yoksa kullanıcı veritabanına eklenir.
+
+LOGIN (GİRİŞ):
+- Kullanıcıdan username ve password alınır.
+- UserService üzerinden kontrol edilir.
+- Eğer bilgiler doğruysa TokenService ile JWT token üretilir.
+- Bu token frontend'e gönderilir.
+- Eğer bilgiler yanlışsa Unauthorized (401) hatası döner.
+
+BAĞLANTILI DOSYALAR:
+- UserService.cs → login ve register mantığı burada çalışır
+- TokenService.cs → JWT token burada üretilir
+- UserRepository.cs → kullanıcı veritabanından burada çekilir
+- Login.jsx → frontend bu endpointleri çağırır
+
+NE ZAMAN ÇALIŞIR:
+- Kullanıcı kayıt olunca
+- Kullanıcı giriş yapınca
+
+NOT:
+- Şifreler şu an düz (plain text) tutulmaktadır.
+- Gerçek projelerde şifreler hashlenerek saklanmalıdır.
+*/

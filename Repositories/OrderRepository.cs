@@ -42,4 +42,35 @@ public void Update(Order order)
     _context.Orders.Update(order);
     _context.SaveChanges();
 }
+
+public List<Order> GetAllOrders()
+{
+    return _context.Orders
+        .Include(o => o.Items)
+        .ThenInclude(i => i.Product)
+        .OrderByDescending(o => o.OrderDate)
+        .ToList();
+}
+
+public void AddStatusLog(OrderStatusLog log)
+{
+    _context.OrderStatusLogs.Add(log);
+    _context.SaveChanges();
+}
+
+public List<OrderStatusLog> GetStatusLogsByOrderId(int orderId)
+{
+    return _context.OrderStatusLogs
+        .Where(l => l.OrderId == orderId)
+        .OrderByDescending(l => l.ChangedAt)
+        .ToList();
+}
+
+public bool HasDeliveredOrderForProduct(int userId, int productId)
+{
+    return _context.Orders.Any(o =>
+        o.UserId == userId &&
+        o.Status == "Delivered" &&
+        o.Items.Any(i => i.ProductId == productId));
+}
 }

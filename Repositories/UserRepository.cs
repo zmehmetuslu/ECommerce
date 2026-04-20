@@ -22,4 +22,15 @@ public class UserRepository
     {
         return _context.Users.FirstOrDefault(u => u.Username == username);
     }
+
+    public User? GetUserById(int userId)
+    {
+        return _context.Users.FirstOrDefault(u => u.Id == userId);
+    }
+
+    public void UpdateUser(User user)
+    {
+        _context.Users.Update(user);
+        _context.SaveChanges();
+    }
 }

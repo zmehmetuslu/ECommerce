@@ -17,6 +17,17 @@ public class UpdateProductDto
     [Required(ErrorMessage = "Image URL is required.")]
     public string ImageUrl { get; set; } = string.Empty;
 
+    public string ShortDescription { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Unit is required.")]
+    public string Unit { get; set; } = "Adet";
+
+    [Range(0, int.MaxValue, ErrorMessage = "Low stock threshold cannot be negative.")]
+    public int LowStockThreshold { get; set; } = 5;
+
+    public string Badge { get; set; } = string.Empty;
+    public bool IsFeatured { get; set; }
+
     [Range(1, int.MaxValue, ErrorMessage = "CategoryId must be greater than 0.")]
     public int CategoryId { get; set; }
 }

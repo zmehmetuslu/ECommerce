@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { loginUser, registerUser } from "../services/authService";
 import { getUserFromToken } from "../utils/auth";
@@ -6,14 +6,11 @@ import { getUserFromToken } from "../utils/auth";
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [isRegister, setIsRegister] = useState(false);
+  const [isRegister, setIsRegister] = useState(
+    () => searchParams.get("mode") === "register"
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
-  useEffect(() => {
-    const mode = searchParams.get("mode");
-    setIsRegister(mode === "register");
-  }, [searchParams]);
 
   const getErrorMessage = (err, fallback) => {
     const data = err?.response?.data;
@@ -105,7 +102,7 @@ export default function Login() {
           <div className="absolute inset-0 flex items-end p-10">
             <div className="text-white">
               <p className="text-sm uppercase tracking-[0.35em] text-white/80">
-                Manavgat Tarım
+                Gök Tarım
               </p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight">
                 Modern tarım alışveriş deneyimine hoş geldin
